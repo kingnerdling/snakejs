@@ -85,7 +85,6 @@ function directionToAngle(snakeDirection) {
   switch (snakeDirection) {
     case "north":
       return 0;
-
     case "east":
       return 90;
     case "south":
