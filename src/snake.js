@@ -1,14 +1,18 @@
 class Snake {
-  constructor(direction, position) {
-    this.movingDirection = direction;
+  constructor(currDirection, position) {
+    this.movingDirection = currDirection;
     this.body = [position];
     this.grow = false;
   }
 
-  move(direction) {
-    this.movingDirection = direction;
+  move(currDirection) {
+    this.movingDirection = currDirection;
 
-    var lastSection = [this.body[this.body.length - 1][0],this.body[this.body.length - 1][1]];
+    var lastSection = [
+      this.body[this.body.length - 1][0],
+      this.body[this.body.length - 1][1]
+    ];
+    
     for (let index = this.body.length - 1; index > 0; index--) {
       this.body[index][0] = this.body[index - 1][0];
       this.body[index][1] = this.body[index - 1][1];
@@ -37,7 +41,6 @@ class Snake {
   expand() {
     this.grow = true;
   }
-
 }
 
 const direction = {
