@@ -41,6 +41,12 @@ function draw() {
     document.getElementById("snake").innerHTML =
       "snake head: " + game.snake.body[0];
     document.getElementById("apple").innerHTML = "apple: " + game.apple;
+    document.getElementById("dtoApple").innerHTML =
+      "dtoApple: " + game.dtoApple;
+    document.getElementById("direction").innerHTML =
+      "direction: " + game.snake.movingDirection;
+    document.getElementById("degreesToApple").innerHTML =
+      "degreesToApple: " + game.degreesToApple;
   }
 }
 

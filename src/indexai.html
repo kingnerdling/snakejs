@@ -4,23 +4,39 @@
 <head>
   <meta charset="UTF-8" />
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.0.4/dist/tf.min.js"></script>
-  <title>SnakeJS</title>
+  <title>SnakeAIjs</title>
 </head>
 
 <body>
   <img id="img_apple" src="resources/apple.png" style="display: none" />
   <img id="img_snakehead" src="resources/snakehead.png" style="display: none" />
   <img id="img_snakebody" src="resources/snakebody.png" style="display: none" />
-  <canvas id="canvas" style="background-color:black"></canvas>
-  <div id="score"></div>
+  <div>
+    <canvas id="canvas" style="background-color:black"></canvas>
+    <div>
+      <input type="file" id="upload-json">json</label>
+      <input type="file" id="upload-weights">weights</label>
+    </div>
+
+  </div>
+
+  <div>
+    <label id="score"></label>
+    <label id="accuracy"></label>
+  </div>
   <div id="snake"></div>
   <div id="apple"></div>
   <div id="dtoApple"></div>
   <div id="direction"></div>
   <div id="degreesToApple"></div>
+  <div id="randomRate"></div>
+  <script src="agent.js"></script>
+  <script src="neuralNetwork.js"></script>
   <script src="snake.js"></script>
   <script src="game.js"></script>
-  <script src="display.js"></script>
+  <script src="evolution.js"></script>
+
+  <script src="displayai.js"></script>
 
   </script>
 </body>
