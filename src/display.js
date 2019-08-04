@@ -16,6 +16,7 @@ let maxFPS = 5;
 function newGame() {
   game = new Game(20, 20);
 }
+
 function pause() {
   paused = paused == true ? false : true;
 }
@@ -24,34 +25,46 @@ function draw() {
   if (canvas.getContext) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    if (game.gameOver) {
-      ctx.fillStyle = "red";
-      ctx.font = "30px Arial";
-      ctx.fillText("Game Over", canvas.width / 2 - 80, canvas.height / 2 - 15);
-    }
-
     if (paused) {
+      ctx.fillStyle = "red";
       ctx.font = "30px Arial";
       ctx.fillText("Paused", 30, 30);
     }
 
-    drawSnake();
+    if (game.gameOver == true) {
+      ctx.fillStyle = "red";
+      ctx.font = "30px Arial";
+      ctx.fillText("GameOver", 30, 30);
+    }
 
-    document.getElementById("score").innerHTML = "score: " + game.totalScore;
-    document.getElementById("snake").innerHTML =
-      "snake head: " + game.snake.body[0];
-    document.getElementById("apple").innerHTML = "apple: " + game.apple;
-    document.getElementById("dtoApple").innerHTML =
-      "dtoApple: " + game.dtoApple;
-    document.getElementById("direction").innerHTML =
-      "direction: " + game.snake.movingDirection;
-    document.getElementById("degreesToApple").innerHTML =
-      "degreesToApple: " + game.degreesToApple;
+    drawSnake();
+    setElements();
+    //apple
+    ctx.drawImage(
+      img_apple,
+      game.apple[0] * squareSize,
+      game.apple[1] * squareSize
+    );
   }
 }
 
+function setElements() {
+  document.getElementById("score").innerHTML = "score: " + game.totalScore;
+  document.getElementById("snake").innerHTML =
+    "snake head: " + game.snake.body[0];
+  document.getElementById("apple").innerHTML = "apple: " + game.apple;
+  document.getElementById("dtoApple").innerHTML = "dtoApple: " + game.dtoApple;
+  document.getElementById("direction").innerHTML =
+    "direction: " + game.snake.movingDirection;
+  document.getElementById("degreesToApple").innerHTML =
+    "degreesToApple: " + game.degreesToApple;
+  document.getElementById("dtos").innerHTML = `front: ${game.dtoFront} left: ${
+    game.dtoLeft
+  } right: ${game.dtoRight}`;
+}
+
 function drawSnake() {
-  var angle = directionToAngle(snakeDirection);
+  var angle = directionToAngle(game.snake.movingDirection);
   //body
   for (let i = game.snake.body.length - 1; i > 0; i--) {
     drawImage(
@@ -69,13 +82,6 @@ function drawSnake() {
     squareSize * game.snake.body[0][1],
     angle
   );
-
-  //apple
-  ctx.drawImage(
-    img_apple,
-    game.apple[0] * squareSize,
-    game.apple[1] * squareSize
-  );
 }
 
 function drawImage(image, x, y, angle) {
@@ -89,13 +95,26 @@ function drawImage(image, x, y, angle) {
 
 function directionToAngle(snakeDirection) {
   switch (snakeDirection) {
-    case "north":
+    case 0:
       return 0;
-    case "east":
-      return 90;
-    case "south":
+    case 1:
       return 180;
-    case "west":
+    case 2:
+      return 90;
+    case 3:
+      return 270;
+  }
+}
+
+function directionToAngle(snakeDirection) {
+  switch (snakeDirection) {
+    case 0:
+      return 0;
+    case 1:
+      return 180;
+    case 2:
+      return 90;
+    case 3:
       return 270;
   }
 }
@@ -103,6 +122,7 @@ function directionToAngle(snakeDirection) {
 function update() {
   if (!paused) {
     game.move(snakeDirection);
+    snakeDirection = 0;
   }
 }
 
@@ -111,13 +131,13 @@ function keyDownHandler(e) {
   e = e || window.event;
 
   if (e.keyCode == "38") {
-    snakeDirection = direction.NORTH;
+    // snakeDirection = direction.NORTH;
   } else if (e.keyCode == "40") {
-    snakeDirection = direction.SOUTH;
+    //snakeDirection = direction.SOUTH;
   } else if (e.keyCode == "37") {
-    snakeDirection = direction.WEST;
+    snakeDirection = 1;
   } else if (e.keyCode == "39") {
-    snakeDirection = direction.EAST;
+    snakeDirection = 2;
   } else if (e.keyCode == "80") {
     pause();
   } else if (e.keyCode == "107") {

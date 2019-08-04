@@ -18,6 +18,7 @@ function newGame() {
   game = new Game(20, 20);
   agent.game = game;
 }
+
 function pause() {
   paused = paused == true ? false : true;
 }
@@ -30,7 +31,7 @@ function draw() {
       ctx.font = "30px Arial";
       ctx.fillText("Paused", 30, 30);
     }
-
+    
     drawSnake();
     setElements();
     //apple
@@ -55,6 +56,9 @@ function setElements() {
   document.getElementById("accuracy").innerHTML = "accuracy: " + agent.accuracy;
   document.getElementById("randomRate").innerHTML =
     "randomRate: " + agent.randomRate;
+  document.getElementById("dtos").innerHTML = `front: ${game.dtoFront} left: ${
+    game.dtoLeft
+  } right: ${game.dtoRight}`;
 }
 
 function drawSnake() {
@@ -103,7 +107,7 @@ function directionToAngle(snakeDirection) {
 async function update() {
   if (!paused) {
     if (trainingMode == true) {
-      if (game.moves > 20) {
+      if (game.moves > 100) {
         newGame();
       }
     }
@@ -167,7 +171,8 @@ async function loop(timestamp) {
   }
 
   lastFrameTimeMs = timestamp;
-  draw();
+
   await update();
+  draw();
   window.requestAnimationFrame(loop);
 }

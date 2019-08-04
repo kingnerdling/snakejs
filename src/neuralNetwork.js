@@ -56,13 +56,21 @@ class NeuralNetwork {
 
     model.add(
       tf.layers.dense({
+        units: this.hidden_nodes / 2,
+        activation: "relu"
+      })
+    );
+
+    model.add(
+      tf.layers.dense({
         units: this.output_nodes,
         activation: "softmax"
       })
     );
+    
     model.compile({
       optimizer: "adam",
-      loss: "categoricalCrossentropy",
+      loss: "meanSquaredError",
       metrics: ["accuracy"]
     });
 

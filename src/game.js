@@ -22,13 +22,81 @@ class Game {
 
   setDistances() {
     this.dtoApple = this.distance(this.snake.body[0], this.apple);
-    this.dtoTop = this.distance([0, this.snake.body[0][1]], [0, 0]);
-    this.dtoBottom = this.distance([20, this.snake.body[0][1]], [20, 20]);
-    this.dtoLeft = this.distance([0, this.snake.body[0][0]], [0, 0]);
-    this.dtoRight = this.distance([20, this.snake.body[0][0]], [20, 20]);
     this.degreesToApple = this.calcDegressToApple();
+    this.setDistancesAround(this.snake.movingDirection);
   }
- 
+
+  setDistancesAround(direction) {
+    var distances = this.DistanceInDirections();
+    switch (direction) {
+      case 0: //north
+        this.dtoFront = distances.north;
+        this.dtoLeft = distances.west;
+        this.dtoRight = distances.east;
+        break;
+      case 1: //south
+        this.dtoFront = distances.south;
+        this.dtoLeft = distances.east;
+        this.dtoRight = distances.west;
+        break;
+      case 2: //east
+        this.dtoFront = distances.east;
+        this.dtoLeft = distances.north;
+        this.dtoRight = distances.south;
+        break;
+      case 3: //west
+        this.dtoFront = distances.west;
+        this.dtoLeft = distances.south;
+        this.dtoRight = distances.north;
+        break;
+    }
+  }
+
+  DistanceInDirections() {
+      var head = this.snake.body[0];
+      var obsticles = [];
+
+      Array.prototype.push.apply(
+        obsticles,
+        this.snake.body.slice(1, this.snake.body.length - 1)
+      );
+      obsticles.push(
+        [head[0], -1],
+        [head[0], this.cols],
+        [-1, head[1]],
+        [this.rows, head[1]]
+      );
+
+      var north =
+        head[1] -
+        Math.max(
+          ...obsticles
+            .filter(x => x[0] == head[0] && x[1] <= head[1])
+            .map(x => x[1])
+        );
+
+      var south =
+        Math.min(
+          ...obsticles
+            .filter(x => x[0] == head[0] && x[1] >= head[1])
+            .map(x => x[1])
+        ) - head[1];
+      var west =
+        head[0] -
+        Math.max(
+          ...obsticles
+            .filter(x => x[1] == head[1] && x[0] <= head[0])
+            .map(x => x[0])
+        );
+      var east =
+        Math.min(
+          ...obsticles
+            .filter(x => x[1] == head[1] && x[0] >= head[0])
+            .map(x => x[0])
+        ) - head[0];
+      return { north: north, south: south, east: east, west: west };
+  }
+
   calcDegressToApple() {
     var angle =
       (Math.atan2(
@@ -66,9 +134,11 @@ class Game {
     this.movesSinceLastScore++;
     this.snake.move(direction);
     this.checkEdge();
-    // this.checkBody();
+    this.checkBody();
     this.checkApple();
-    this.setDistances();
+    if (!this.gameOver) {
+      this.setDistances();
+    }
   }
 
   checkEdge() {

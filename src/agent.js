@@ -5,7 +5,7 @@ class Agent {
     this.applesCollected = 0;
     this.agentScore = 0;
     this.moves = 0;
-    this.neuralNetwork = new NeuralNetwork(2, 16, 3, model);
+    this.neuralNetwork = new NeuralNetwork(5, 16, 3, model);
     this.randomRate = 0.6;
   }
 
@@ -22,9 +22,10 @@ class Agent {
   move() {
     this.moves++;
     var dtoApple = this.game.dtoApple;
-    var moveScore = 0;
+
     var inputs = this.generateInputs();
     var selectedTurn = this.selectTurn(inputs, this.randomRate);
+    var moveScore = this.AvoidedBody(selectedTurn);
     this.game.move(selectedTurn);
 
     if (this.game.movesSinceLastScore > 200) {
@@ -35,38 +36,76 @@ class Agent {
     if (this.game.gameOver == false) {
       if (this.game.applesCollected > this.applesCollected) {
         this.applesCollected++;
-        moveScore = 100;
+        moveScore = +500;
       } else if (this.game.dtoApple < dtoApple) {
-        moveScore = 1;
-      } else {
-        moveScore = 0;
+        moveScore = +1;
       }
 
       this.agentScore += moveScore;
       dtoApple = this.game.dtoApple;
       if (moveScore > 0) {
-        if (this.memory.find(o => o.name == inputs.join("|")) == null) {
-          this.memory.push({
-            name: inputs.join("|"),
-            inputs: inputs,
-            label: selectedTurn,
-            score: moveScore
-          });
-        } else {
-          console.log("already in memory");
-        }
-      }
-      if (this.memory.length > 105) {
-        this.memory = this.memory.splice(0, 100);
+        this.AddToMemory(inputs, selectedTurn, moveScore);
       }
     }
   }
 
+  AddToMemory(inputs, label, score) {
+    if (this.memory.find(o => o.name == inputs.join("|")) == null) {
+      for (let i = 0; i < score; i++) {
+        this.memory.push({
+          name: inputs.join("|"),
+          inputs: inputs,
+          label: label,
+          score: score
+        });
+      }
+    } else {
+      console.log("already in memory");
+    }
+  }
+
+  AvoidedBody(selectedTurn) {
+    var score = 0;
+    if (this.game.dtoFront < 2 && selectedTurn != 0) {
+      score += 2;
+    }
+    switch (selectedTurn) {
+      case 0:
+        if (
+          this.game.dtoFront > 1 &&
+          (this.game.dtoLeft < 2) & (this.game.dtoRight < 2)
+        ) {
+          score += 100;
+        }
+        break;
+      case 1:
+        if (
+          this.game.dtoLeft > 1 &&
+          (this.game.dtoFront < 2) & (this.game.dtoRight < 2)
+        ) {
+          score += 100;
+        }
+        break;
+      case 2:
+        if (
+          this.game.dtoRight > 1 &&
+          (this.game.dtoLeft < 2) & (this.game.dtoFront < 2)
+        ) {
+          score += 100;
+        }
+        break;
+    }
+    return score;
+  }
+
   async train() {
-    if (this.memory.length > 100) {
+    if (this.memory.length > 1000) {
       let randomSample = this.memory
         .sort(() => 0.5 - Math.random())
-        .slice(0, 100);
+        .slice(0, 1000);
+
+      this.memory.splice(0, 1000);
+
       var inputs = randomSample.map(x => x.inputs);
       var labels = randomSample.map(x => x.label);
       await this.neuralNetwork.train(inputs, labels);
@@ -78,7 +117,7 @@ class Agent {
     var maxIndex = this.max_index(outputs);
     var maxOutput = outputs[maxIndex];
     this.accuracy = maxOutput;
-    if (maxOutput < rate) {
+    if (Math.random() < rate) {
       return this.getRandomInt(0, 2);
     }
     return maxIndex;
@@ -97,7 +136,10 @@ class Agent {
   generateInputs(turn) {
     return [
       this.game.degreesToApple / 360,
-      this.game.snake.movingDirection / 4
+      this.game.snake.movingDirection / 4,
+      this.game.dtoFront / 25,
+      this.game.dtoLeft / 25,
+      this.game.dtoRight / 25
     ];
   }
 
@@ -105,6 +147,7 @@ class Agent {
     var fit = this.applesCollected / this.moves;
     return this.agentScore;
   }
+  
   getRandomInt(min, max) {
     min = Math.ceil(min);
     max = Math.floor(max);
