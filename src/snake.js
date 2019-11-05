@@ -20,23 +20,24 @@ class Snake {
       this.body[index][1] = this.body[index - 1][1];
     }
 
-    switch (this.movingDirection) {
-      case 0:
-        this.body[0][1] = this.body[0][1] - 1;
-        break;
-      case 1:
-        this.body[0][1] = this.body[0][1] + 1;
-        break;
-      case 2:
-        this.body[0][0] = this.body[0][0] + 1;
-        break;
-      case 3:
-        this.body[0][0] = this.body[0][0] - 1;
-        break;
-    }
+    var nextPos = this.headNextPosition(this.movingDirection);
+    this.body[0] = nextPos;
     if (this.grow) {
       this.body.push(lastSection);
       this.grow = false;
+    }
+  }
+
+  headNextPosition(direction) {
+    switch (direction) {
+      case 0:
+        return [this.body[0][0], this.body[0][1] - 1];
+      case 1:
+        return [this.body[0][0], this.body[0][1] + 1];
+      case 2:
+        return [this.body[0][0] + 1, this.body[0][1]];
+      case 3:
+        return [this.body[0][0] - 1, this.body[0][1]];
     }
   }
 

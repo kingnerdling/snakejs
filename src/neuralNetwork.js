@@ -32,7 +32,7 @@ class NeuralNetwork {
 
   async train(x, y) {
     var xs = tf.tensor2d(x);
-    var ys = tf.oneHot(tf.tensor1d(y).toInt(), this.output_nodes);
+    var ys = tf.tensor2d(y);
     if (this.canTrain == true) {
       this.canTrain = false;
       await this.model
@@ -64,14 +64,13 @@ class NeuralNetwork {
     model.add(
       tf.layers.dense({
         units: this.output_nodes,
-        activation: "softmax"
-      })
+       })
     );
-    
+
     model.compile({
       optimizer: "adam",
       loss: "meanSquaredError",
-      metrics: ["accuracy"]
+      metrics: ["mse"]
     });
 
     return model;
@@ -85,8 +84,8 @@ class NeuralNetwork {
     var model = await tf.loadLayersModel(path);
     model.compile({
       optimizer: "adam",
-      loss: "categoricalCrossentropy",
-      metrics: ["accuracy"]
+      loss: "meanSquaredError",
+      metrics: ["mse"]
     });
 
     return model;

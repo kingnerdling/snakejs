@@ -53,48 +53,48 @@ class Game {
   }
 
   DistanceInDirections() {
-      var head = this.snake.body[0];
-      var obsticles = [];
+    var head = this.snake.body[0];
+    var obsticles = [];
 
-      Array.prototype.push.apply(
-        obsticles,
-        this.snake.body.slice(1, this.snake.body.length - 1)
+    Array.prototype.push.apply(
+      obsticles,
+      this.snake.body.slice(1, this.snake.body.length - 1)
+    );
+    obsticles.push(
+      [head[0], -1],
+      [head[0], this.cols],
+      [-1, head[1]],
+      [this.rows, head[1]]
+    );
+
+    var north =
+      head[1] -
+      Math.max(
+        ...obsticles
+          .filter(x => x[0] == head[0] && x[1] <= head[1])
+          .map(x => x[1])
       );
-      obsticles.push(
-        [head[0], -1],
-        [head[0], this.cols],
-        [-1, head[1]],
-        [this.rows, head[1]]
+
+    var south =
+      Math.min(
+        ...obsticles
+          .filter(x => x[0] == head[0] && x[1] >= head[1])
+          .map(x => x[1])
+      ) - head[1];
+    var west =
+      head[0] -
+      Math.max(
+        ...obsticles
+          .filter(x => x[1] == head[1] && x[0] <= head[0])
+          .map(x => x[0])
       );
-
-      var north =
-        head[1] -
-        Math.max(
-          ...obsticles
-            .filter(x => x[0] == head[0] && x[1] <= head[1])
-            .map(x => x[1])
-        );
-
-      var south =
-        Math.min(
-          ...obsticles
-            .filter(x => x[0] == head[0] && x[1] >= head[1])
-            .map(x => x[1])
-        ) - head[1];
-      var west =
-        head[0] -
-        Math.max(
-          ...obsticles
-            .filter(x => x[1] == head[1] && x[0] <= head[0])
-            .map(x => x[0])
-        );
-      var east =
-        Math.min(
-          ...obsticles
-            .filter(x => x[1] == head[1] && x[0] >= head[0])
-            .map(x => x[0])
-        ) - head[0];
-      return { north: north, south: south, east: east, west: west };
+    var east =
+      Math.min(
+        ...obsticles
+          .filter(x => x[1] == head[1] && x[0] >= head[0])
+          .map(x => x[0])
+      ) - head[0];
+    return { north: north, south: south, east: east, west: west };
   }
 
   calcDegressToApple() {
@@ -133,42 +133,13 @@ class Game {
     this.moves++;
     this.movesSinceLastScore++;
     this.snake.move(direction);
-    this.checkEdge();
-    this.checkBody();
-    this.checkApple();
-    if (!this.gameOver) {
-      this.setDistances();
-    }
-  }
-
-  checkEdge() {
-    if (
-      (this.snake.body[0][0] < 0) |
-      (this.snake.body[0][0] > this.rows - 1) |
-      (this.snake.body[0][1] < 0) |
-      (this.snake.body[0][1] > this.cols - 1)
-    ) {
+    if (this.checkEdge(this.snake.body[0][0], this.snake.body[0][1])) {
       this.gameOver = true;
     }
-  }
-
-  checkBody() {
-    for (let i = 1; i < this.snake.body.length - 1; i++) {
-      if (
-        this.snake.body[0][0] == this.snake.body[i][0] &&
-        this.snake.body[0][1] == this.snake.body[i][1]
-      ) {
-        this.gameOver = true;
-        return;
-      }
+    if (this.checkBody(this.snake.body[0][0], this.snake.body[0][1])) {
+      this.gameOver = true;
     }
-  }
-
-  checkApple() {
-    if (
-      this.snake.body[0][0] == this.apple[0] &&
-      this.snake.body[0][1] == this.apple[1]
-    ) {
+    if (this.checkApple(this.snake.body[0][0], this.snake.body[0][1])) {
       this.applesCollected += 1;
       this.apple = [
         Math.floor(Math.random() * Math.floor(this.rows - 1)),
@@ -177,6 +148,29 @@ class Game {
       this.snake.expand();
       this.totalScore += 1;
       this.movesSinceLastScore = 0;
+    }
+    if (!this.gameOver) {
+      this.setDistances();
+    }
+  }
+
+  checkEdge(x, y) {
+    if ((x < 0) | (x > this.rows - 1) | (y < 0) | (y > this.cols - 1)) {
+      return true;
+    }
+  }
+
+  checkBody(x, y) {
+    for (let i = 1; i < this.snake.body.length - 1; i++) {
+      if (x == this.snake.body[i][0] && y == this.snake.body[i][1]) {
+        return true;
+      }
+    }
+  }
+
+  checkApple(x, y) {
+    if (x == this.apple[0] && y == this.apple[1]) {
+      return true;
     }
   }
 }

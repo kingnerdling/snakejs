@@ -5,6 +5,7 @@ canvas.height = 600;
 
 let img_apple = document.getElementById("img_apple");
 let img_snakehead = document.getElementById("img_snakehead");
+let img_snakeheadai = document.getElementById("img_snakeheadai");
 let img_snakebody = document.getElementById("img_snakebody");
 let game = new Game(20, 20);
 let agent = new Agent(game);
@@ -13,6 +14,7 @@ let paused = false;
 let lastFrameTimeMs = 0;
 let maxFPS = 5;
 let trainingMode = true;
+let lastSave = new Date();
 
 function newGame() {
   game = new Game(20, 20);
@@ -31,7 +33,7 @@ function draw() {
       ctx.font = "30px Arial";
       ctx.fillText("Paused", 30, 30);
     }
-    
+
     drawSnake();
     setElements();
     //apple
@@ -44,6 +46,8 @@ function draw() {
 }
 
 function setElements() {
+  document.getElementById("maxScore").innerHTML =
+    "max score: " + agent.maxScore;
   document.getElementById("score").innerHTML = "score: " + game.totalScore;
   document.getElementById("snake").innerHTML =
     "snake head: " + game.snake.body[0];
@@ -56,9 +60,11 @@ function setElements() {
   document.getElementById("accuracy").innerHTML = "accuracy: " + agent.accuracy;
   document.getElementById("randomRate").innerHTML =
     "randomRate: " + agent.randomRate;
-  document.getElementById("dtos").innerHTML = `front: ${game.dtoFront} left: ${
-    game.dtoLeft
-  } right: ${game.dtoRight}`;
+  document.getElementById(
+    "dtos"
+  ).innerHTML = `front: ${game.dtoFront} left: ${game.dtoLeft} right: ${game.dtoRight}`;
+  document.getElementById("training").innerHTML = "training: " + trainingMode;
+  document.getElementById("lastSave").innerHTML = "lastSave: " + lastSave;
 }
 
 function drawSnake() {
@@ -74,12 +80,21 @@ function drawSnake() {
   }
 
   //head
-  drawImage(
-    img_snakehead,
-    squareSize * game.snake.body[0][0],
-    squareSize * game.snake.body[0][1],
-    angle
-  );
+  if (agent.randomMove) {
+    drawImage(
+      img_snakeheadai,
+      squareSize * game.snake.body[0][0],
+      squareSize * game.snake.body[0][1],
+      angle
+    );
+  } else {
+    drawImage(
+      img_snakehead,
+      squareSize * game.snake.body[0][0],
+      squareSize * game.snake.body[0][1],
+      angle
+    );
+  }
 }
 
 function drawImage(image, x, y, angle) {
@@ -107,7 +122,7 @@ function directionToAngle(snakeDirection) {
 async function update() {
   if (!paused) {
     if (trainingMode == true) {
-      if (game.moves > 100) {
+      if (game.movesSinceLastScore > 500) {
         newGame();
       }
     }
@@ -123,6 +138,7 @@ async function update() {
 
 async function saveModel() {
   await agent.neuralNetwork.save("localstorage://my-model-1");
+  lastSave = new Date();
 }
 
 async function loadModel() {
