@@ -22,7 +22,7 @@ class NeuralNetwork {
 
   predict(inputs) {
     return tf.tidy(() => {
-      const xs = tf.tensor2d([inputs]);
+      const xs = tf.tensor2d(inputs);
       const ys = this.model.predict(xs);
       const outputs = ys.dataSync();
       // console.log(outputs);

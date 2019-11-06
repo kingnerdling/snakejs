@@ -173,4 +173,18 @@ class Game {
       return true;
     }
   }
+
+  toArray() {
+    let array = Array(this.rows)
+      .fill()
+      .map(() => Array(this.cols).fill(0));
+
+    this.snake.body.forEach(pos => {
+      array[pos[0]][pos[1]] = 1;
+    });
+    array[this.snake.body[0][0]][this.snake.body[0][1]] =
+      this.snake.movingDirection + 5;
+    array[this.apple[0]][this.apple[1]] = 2;
+    return array;
+  }
 }

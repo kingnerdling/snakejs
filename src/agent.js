@@ -1,11 +1,11 @@
 class Agent {
   constructor(game, model) {
     this.game = game;
-    this.memory = [];
+    this.memory = [];q
     this.applesCollected = 0;
     this.agentScore = 0;
     this.moves = 0;
-    this.neuralNetwork = new NeuralNetwork(5, 16, 3, model);
+    this.neuralNetwork = new NeuralNetwork(1, 16, 3, model);
     this.randomRate = 0.6;
     this.randomMove = false;
     this.maxScore = 0;
@@ -76,7 +76,7 @@ class Agent {
       if (this.game.distance(headPos, this.game.apple) < this.game.dtoApple) {
         scores[i] += 10;
       }
-     // scores[i] += this.AvoidedBody(i);
+      // scores[i] += this.AvoidedBody(i);
     }
 
     return scores;
@@ -85,7 +85,6 @@ class Agent {
   AddToMemory(inputs, label, score) {
     if (this.memory.find(o => o.name == inputs.join("|")) == null) {
       this.memory.push({
-        name: inputs.join("|"),
         inputs: inputs,
         label: label
       });
@@ -166,14 +165,8 @@ class Agent {
     return mi;
   }
 
-  generateInputs(turn) {
-    return [
-      this.game.degreesToApple / 360,
-      this.game.snake.movingDirection / 4,
-      this.game.dtoFront / 25,
-      this.game.dtoLeft / 25,
-      this.game.dtoRight / 25
-    ];
+  generateInputs() {
+    return this.game.toArray();
   }
 
   fitness() {
